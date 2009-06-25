@@ -37,10 +37,19 @@ class EmailNotifier
   end
 
   def build_finished(build)
-    return if @emails.empty? or not build.failed?
-    email :deliver_build_report, build, "#{build.project.name} build #{build.label} failed", "The build failed."
+    return if @emails.empty? # or not build.failed?
+    if build.successful?
+      email :deliver_build_report, build, "#{build.project.name} build #{build.label} succeeded", "The build succeeded."
+    else
+      email :deliver_build_report, build, "#{build.project.name} build #{build.label} failed", "The build failed."
+    end
   end
 
+  def build_broken(build, previous_build)
+    return if @emails.empty?
+    email :deliver_build_report, build, "#{build.project.name} build #{build.label} broken", "The build has been broken."
+  end
+  
   def build_fixed(build, previous_build)
     return if @emails.empty?
     email :deliver_build_report, build, "#{build.project.name} build #{build.label} fixed", "The build has been fixed."
